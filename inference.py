@@ -58,6 +58,16 @@ def parse_args():
         action='store_true',
         help='display output frames in an OpenCV window')
     parser.add_argument(
+        '--display-width',
+        type=int,
+        default=1280,
+        help='maximum OpenCV preview window width when using --show')
+    parser.add_argument(
+        '--display-height',
+        type=int,
+        default=720,
+        help='maximum OpenCV preview window height when using --show')
+    parser.add_argument(
         '--show-score',
         action='store_true',
         help='draw confidence score beside the predicted class')
@@ -182,6 +192,16 @@ def draw_label(frame, label, score=None):
                 FONT_THICKNESS, cv2.LINE_AA)
 
 
+def resize_for_display(frame, max_width, max_height):
+    height, width = frame.shape[:2]
+    scale = min(max_width / width, max_height / height, 1.0)
+    if scale >= 1.0:
+        return frame
+
+    display_size = (int(width * scale), int(height * scale))
+    return cv2.resize(frame, display_size, interpolation=cv2.INTER_AREA)
+
+
 def main():
     args = parse_args()
     labels = load_labels(args.label_map)
@@ -255,7 +275,9 @@ def main():
         writer.write(frame)
 
         if args.show:
-            cv2.imshow('Action Recognition', frame)
+            display_frame = resize_for_display(
+                frame, args.display_width, args.display_height)
+            cv2.imshow('Action Recognition', display_frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 

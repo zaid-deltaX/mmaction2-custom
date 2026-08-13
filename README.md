@@ -68,7 +68,7 @@ Important: the order in `label_map.txt` must match the class indices in `train.t
 
 ## 2. Available Model Configs
 
-Use one of these config files when training:
+created these config files for the models. You can create your own from configs/recognition/ folder .Use one of these config files when training:
 
 ```text
 configs/recognition/tsn/tsn_r50_fighting_normal.py
@@ -78,17 +78,17 @@ configs/recognition/swin/swin-tiny-p244_fighting_normal.py
 configs/recognition/videomae/vit-videomae_p16_fighting_normal.py
 ```
 
-Typical model choices:
-
-```text
-TSN       Faster baseline, weaker temporal reasoning.
-TSM       Good speed/accuracy balance.
-SlowFast  Strong video model, heavier than TSN/TSM.
-Swin      Transformer-based video model.
-VideoMAE  Transformer-based model, usually heaviest in this setup.
-```
 
 ## 3. Train a Model
+
+Dataset path can be handled in two ways:
+
+```text
+1. Put dataset paths directly inside the config file.
+2. Pass the dataset root to train.py as an argument.
+```
+
+The recommended workflow in this repo is option 2. When you pass `dataset/v2` to `train.py`, the script automatically overrides the config dataset paths for training, validation, and testing.
 
 Basic command:
 
@@ -98,6 +98,23 @@ python train.py `
   dataset/v2 `
   --classes fighting normal `
   --work-dir work_dirs/tsm_r50_fighting_normal
+```
+
+In that command:
+
+```text
+configs/recognition/tsm/tsm_r50_fighting_normal.py  -> model/config file
+dataset/v2                                           -> dataset root argument
+```
+
+`train.py` uses the dataset argument to set:
+
+```text
+train data root -> dataset/v2/train
+val data root   -> dataset/v2/val
+train ann file  -> dataset/v2/train.txt
+val ann file    -> dataset/v2/val.txt
+test ann file   -> dataset/v2/val.txt
 ```
 
 Train TSN:
